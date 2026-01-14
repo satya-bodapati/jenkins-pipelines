@@ -51,11 +51,11 @@
             default: false
             description: "Run kmip tests"
         - choice:
-            name: LABEL
+            name: CLOUD
             choices:
-            - docker-32gb
-            - docker
-            description: Run build on specified instance type. 
+            - "Hetzner"
+            - "AWS"
+            description: "Host provider for Jenkins workers"
     builders:
     - multijob:
         name: compile-stage

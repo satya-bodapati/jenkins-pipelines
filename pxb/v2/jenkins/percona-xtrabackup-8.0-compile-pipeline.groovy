@@ -1,3 +1,12 @@
+// Default to Hetzner
+String LABEL = 'docker-x64'
+String MICRO_LABEL = 'launcher-x64'
+
+if (params.CLOUD == 'AWS') {
+    LABEL = 'docker-32gb'
+    MICRO_LABEL = 'micro-amazon'
+}
+
 pipeline {
     parameters {
         string(
@@ -27,12 +36,13 @@ pipeline {
             description: 'make options, like VERBOSE=1',
             name: 'MAKE_OPTS')
         choice(
-            choices: 'docker-32gb\ndocker',
-            description: 'Run build on specified instance type',
-            name: 'LABEL')
+            choices: 'Hetzner\nAWS',
+            description: 'Host provider for Jenkins workers',
+            name: 'CLOUD')
+
     }
     agent {
-        label 'micro-amazon'
+        label MICRO_LABEL
     }
     options {
         skipDefaultCheckout()
@@ -113,7 +123,7 @@ pipeline {
             }
         }
         stage('Archive Build') {
-            agent { label 'micro-amazon' }
+            agent { label MICRO_LABEL}
             steps {
                 timeout(time: 60, unit: 'MINUTES')  {
                     retry(3) {

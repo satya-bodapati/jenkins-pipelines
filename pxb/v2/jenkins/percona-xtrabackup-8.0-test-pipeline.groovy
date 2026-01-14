@@ -1,3 +1,12 @@
+// Default to Hetzner
+String LABEL = 'docker-x64'
+String MICRO_LABEL = 'launcher-x64'
+
+if (params.CLOUD == 'AWS') {
+    LABEL = 'docker-32gb'
+    MICRO_LABEL = 'micro-amazon'
+}
+
 pipeline {
     parameters {
         choice(
@@ -45,12 +54,13 @@ pipeline {
             defaultValue: true,
             description: 'Run kmip tests')
         choice(
-            choices: 'docker-32gb\ndocker',
-            description: 'Run build on specified instance type',
-            name: 'LABEL')
+            choices: 'Hetzner\nAWS',
+            description: 'Host provider for Jenkins workers',
+            name: 'CLOUD')
+
     }
     agent {
-        label 'micro-amazon'
+        label MICRO_LABEL
     }
     options {
         skipDefaultCheckout()
@@ -141,7 +151,7 @@ pipeline {
             }
         }
         stage('Archive Test Results') {
-            agent { label 'micro-amazon' }
+            agent { label MICRO_LABEL }
             steps {
                 retry(3) {
                 deleteDir()
