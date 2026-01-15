@@ -86,7 +86,7 @@
           DOCKER_OS=${{DOCKER_OS}}
           CMAKE_BUILD_TYPE=${{CMAKE_BUILD_TYPE}}
           XTRABACKUP_TARGET=${{XTRABACKUP_TARGET}}
-          CLOUD=$${CLOUD}}
+          CLOUD=${{CLOUD}}
         block: true
         block-thresholds:
           build-step-failure-threshold: FAILURE
