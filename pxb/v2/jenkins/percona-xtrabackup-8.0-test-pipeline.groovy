@@ -78,7 +78,7 @@ pipeline {
                     }
                     sh 'echo Prepare: \$(date -u "+%s")'
                     git branch: 'master', url: 'https://github.com/satya-bodapati/jenkins-pipelines'
-                    sh ''' #!/bin/bash
+                    sh '''#!/bin/bash
                         # sudo is needed for better node recovery after compilation failure
                         # if building failed on compilation stage directory will have files owned by docker user
                         sudo git reset --hard
@@ -90,8 +90,7 @@ pipeline {
                         '''
                     copyArtifacts filter: 'COMPILE_BUILD_TAG', projectName: 'percona-xtrabackup-8.0-compile-param', selector: lastSuccessful()
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: '24e68886-c552-4033-8503-ed85bbaa31f3', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                        sh '''
-                            #!/bin/bash
+                        sh '''#!/bin/bash
                             for file in $(find . -name "COMPILE_BUILD_TAG"); do
                                 COMPILE_BUILD_TAG_VAR+=" $(cat $file)"
                             done

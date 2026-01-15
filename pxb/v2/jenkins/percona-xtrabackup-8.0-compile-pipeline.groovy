@@ -60,7 +60,7 @@ pipeline {
                     }
                     sh 'echo Prepare: \$(date -u "+%s")'
                     echo 'Checking Percona XtraBackup branch version, JEN-913 prevent wrong version run'
-                    sh ''' #!/bin/bash
+                    sh '''#!/bin/bash
                         MY_BRANCH_BASE_MAJOR=8
                         MY_BRANCH_BASE_MINOR=0
                         RAW_VERSION_LINK=$(echo ${GIT_REPO%.git} | sed -e "s:github.com:raw.githubusercontent.com:g")
@@ -76,7 +76,7 @@ pipeline {
                     '''
                     git branch: 'master', url: 'https://github.com/satya-bodapati/jenkins-pipelines'
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: '24e68886-c552-4033-8503-ed85bbaa31f3', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                        sh ''' #!/bin/bash
+                        sh '''#!/bin/bash
                             # sudo is needed for better node recovery after compilation failure
                             # if building failed on compilation stage directory will have files owned by docker user
                             sudo git reset --hard
