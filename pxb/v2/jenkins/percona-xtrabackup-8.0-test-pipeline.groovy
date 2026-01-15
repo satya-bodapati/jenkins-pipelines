@@ -78,7 +78,7 @@ pipeline {
                     }
                     sh 'echo Prepare: \$(date -u "+%s")'
                     git branch: 'master', url: 'https://github.com/satya-bodapati/jenkins-pipelines'
-                    sh '''
+                    sh ''' #!/bin/bash
                         # sudo is needed for better node recovery after compilation failure
                         # if building failed on compilation stage directory will have files owned by docker user
                         sudo git reset --hard
