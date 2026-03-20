@@ -82,7 +82,7 @@ else
         errmsg
       fi
       ;;
-    noble|bookworm)
+    noble|bookworm|trixie)
       sudo apt update
       sudo DEBIAN_FRONTEND=noninteractive apt install -y python3-subunit python3-junitxml
       SUBUNIT2JUNITXML_CMD="./subunit2junitxml_python3"
