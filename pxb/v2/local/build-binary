@@ -42,9 +42,6 @@ wget_loop() {
     fi
 }
 
-BOOST_VERSION=$(grep 'SET(BOOST_PACKAGE_NAME' ${SOURCEDIR}/cmake/boost.cmake | sed -re 's/.*([0-9]+_[0-9]+_[0-9]+).*/\1/')
-wget_loop "boost_${BOOST_VERSION}.tar.bz2" "http://downloads.sourceforge.net/boost/boost/${BOOST_VERSION//_/.}/boost_${BOOST_VERSION}.tar.bz2"
-
 # ------------------------------------------------------------------------------
 # Set OS/Arch flags
 # ------------------------------------------------------------------------------
@@ -115,8 +112,6 @@ FULL_PRODUCT_NAME="percona-xtrabackup-${XTRABACKUP_VERSION}-$(uname -s)-$(uname 
 pushd ${WORKDIR}
     ${JOB_CMAKE} \
         ${BUILD_TYPE} \
-        -DDOWNLOAD_BOOST=ON \
-        -DWITH_BOOST=${DOWNLOAD_DIR} \
         -DCMAKE_INSTALL_PREFIX=${FULL_PRODUCT_NAME} \
         -DINSTALL_MYSQLTESTDIR=${FULL_PRODUCT_NAME}-test \
         -DINSTALL_MANDIR=${FULL_PRODUCT_NAME}/man \
