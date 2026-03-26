@@ -53,7 +53,7 @@
          name: DOCKER_OS
          values:
          - oraclelinux:9
-         - amazonlinux:2023
+         - ubuntu:jammy
     builders:
     - trigger-builds:
       - project: percona-xtrabackup-8.1-arm-compile-pipeline

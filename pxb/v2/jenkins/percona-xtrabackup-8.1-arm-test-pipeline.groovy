@@ -10,7 +10,7 @@ if (params.CLOUD == 'AWS') {
 pipeline {
     parameters {
         choice(
-            choices: 'oraclelinux:9\namazonlinux:2023',
+            choices: 'oraclelinux:9\nubuntu:jammy',
             description: 'OS version for testing',
             name: 'DOCKER_OS')
         choice(

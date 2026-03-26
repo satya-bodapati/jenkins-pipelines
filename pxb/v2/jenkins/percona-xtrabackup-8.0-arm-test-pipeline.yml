@@ -18,7 +18,7 @@
         name: DOCKER_OS
         choices:
           - oraclelinux:9
-          - amazonlinux:2023
+          - ubuntu:jammy
         description: OS version for testing
     - choice:
         name: CMAKE_BUILD_TYPE

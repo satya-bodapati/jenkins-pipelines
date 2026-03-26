@@ -73,7 +73,7 @@
         name: DOCKER_OS
         values:
         - oraclelinux:9
-        - amazonlinux:2023
+        - ubuntu:jammy
     - axis:
         name: XTRABACKUP_TARGET
         type: user-defined
@@ -82,7 +82,7 @@
         - xtradb80
     combination-filter: >
       (XTRABACKUP_TARGET=="innodb80" && DOCKER_OS=="oraclelinux:9") ||
-      (XTRABACKUP_TARGET=="xtradb80" && DOCKER_OS=="amazonlinux:2023")
+      (XTRABACKUP_TARGET=="xtradb80" && DOCKER_OS=="ubuntu:jammy")
     builders:
     - trigger-builds:
       - project: percona-xtrabackup-8.1-arm-test-pipeline
