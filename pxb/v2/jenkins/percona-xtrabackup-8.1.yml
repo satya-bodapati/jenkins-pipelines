@@ -75,7 +75,7 @@
               current-parameters: true
             - name: percona-xtrabackup-8.1-arm-compile-param
               current-parameters: true
-              enable-condition: '${WITH_ARM_TESTS} == true'
+              enable-condition: '${{WITH_ARM_TESTS}} == true'
     - multijob:
         name: test-stage
         condition: UNSTABLE
@@ -84,4 +84,4 @@
               current-parameters: true
             - name: percona-xtrabackup-8.1-arm-test-param
               current-parameters: true
-              enable-condition: '${WITH_ARM_TESTS} == true'
+              enable-condition: '${{WITH_ARM_TESTS}} == true'
