@@ -1,16 +1,16 @@
 // Default to Hetzner
-String LABEL = 'docker-x64'
+String LABEL = (params.ARCH == 'aarch64') ? 'docker-aarch64' : 'docker-x64'
 String MICRO_LABEL = 'launcher-x64'
 
 if (params.CLOUD == 'AWS') {
-    LABEL = 'docker-32gb'
+    LABEL = (params.ARCH == 'aarch64') ? 'docker-32gb-aarch64' : 'docker-32gb'
     MICRO_LABEL = 'micro-amazon'
 }
 
 pipeline {
     parameters {
         choice(
-            choices: 'centos:8\noraclelinux:9\nubuntu:focal\nubuntu:jammy\nubuntu:noble\ndebian:bullseye\ndebian:bookworm\nasan',
+            choices: 'centos:8\noraclelinux:9\nubuntu:focal\nubuntu:jammy\nubuntu:noble\ndebian:bullseye\ndebian:bookworm\nasan\namazonlinux:2023',
             description: 'OS version for compilation',
             name: 'DOCKER_OS')
         choice(
@@ -54,6 +54,10 @@ pipeline {
             defaultValue: true,
             description: 'Run kmip tests')
         choice(
+            choices: 'x86_64\naarch64',
+            description: 'CPU architecture for testing',
+            name: 'ARCH')
+        choice(
             choices: 'Hetzner\nAWS',
             description: 'Host provider for Jenkins workers',
             name: 'CLOUD')
@@ -73,7 +77,7 @@ pipeline {
             steps {
                 timeout(time: 240, unit: 'MINUTES')  {
                     script {
-                        currentBuild.displayName = "${BUILD_NUMBER} ${CMAKE_BUILD_TYPE}/${DOCKER_OS}"
+                        currentBuild.displayName = "${BUILD_NUMBER} ${CMAKE_BUILD_TYPE}/${DOCKER_OS}/${ARCH}"
                     }
                     sh 'echo Prepare: \$(date -u "+%s")'
                     git branch: 'master', url: 'https://github.com/Percona-Lab/jenkins-pipelines'
@@ -96,22 +100,22 @@ pipeline {
 
                             for tarball in $(echo $COMPILE_BUILD_TAG_VAR); do
                                 if [[ $CMAKE_BUILD_TYPE == "Debug" ]] && [[ ${DOCKER_OS} != "asan" ]]; then
-                                    TARBALL=$(aws s3 ls pxb-build-cache/$tarball/ | grep x86_64-${DOCKER_OS//:/-}-debug | awk {'print $4'})
+                                    TARBALL=$(aws s3 ls pxb-build-cache/$tarball/ | grep ${ARCH}-${DOCKER_OS//:/-}-debug | awk {'print $4'})
                                     if [[ ! -z $TARBALL ]]; then
                                         break
                                     fi
                                 elif [[ $CMAKE_BUILD_TYPE == "RelWithDebInfo" ]] && [[ ${DOCKER_OS} != "asan" ]]; then
-                                    TARBALL+=$(aws s3 ls pxb-build-cache/$tarball/ | grep x86_64-${DOCKER_OS//:/-}.tar.gz | awk {'print $4'})
+                                    TARBALL+=$(aws s3 ls pxb-build-cache/$tarball/ | grep ${ARCH}-${DOCKER_OS//:/-}.tar.gz | awk {'print $4'})
                                     if [[ ! -z $TARBALL ]]; then
                                         break
                                     fi
                                 elif [[ $CMAKE_BUILD_TYPE == "Debug" ]] && [[ ${DOCKER_OS} == "asan" ]]; then
-                                    TARBALL+=$(aws s3 ls pxb-build-cache/$tarball/ | grep x86_64-${DOCKER_OS//:/-}-asan-debug | awk {'print $4'})
+                                    TARBALL+=$(aws s3 ls pxb-build-cache/$tarball/ | grep ${ARCH}-${DOCKER_OS//:/-}-asan-debug | awk {'print $4'})
                                     if [[ ! -z $TARBALL ]]; then
                                         break
                                     fi
                                 elif [[ $CMAKE_BUILD_TYPE == "RelWithDebInfo" ]] && [[ ${DOCKER_OS} == "asan" ]]; then
-                                    TARBALL+=$(aws s3 ls pxb-build-cache/$tarball/ | grep x86_64-${DOCKER_OS//:/-}-asan | awk {'print $4'})
+                                    TARBALL+=$(aws s3 ls pxb-build-cache/$tarball/ | grep ${ARCH}-${DOCKER_OS//:/-}-asan | awk {'print $4'})
                                     if [[ ! -z $TARBALL ]]; then
                                         break
                                     fi

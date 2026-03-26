@@ -76,12 +76,23 @@
         - debian:bullseye
         - debian:bookworm
         - asan
+        - amazonlinux:2023
     - axis:
         name: XTRABACKUP_TARGET
         type: user-defined
         values:
         - innodb80
         - xtradb80
+    - axis:
+        name: ARCH
+        type: user-defined
+        values:
+        - x86_64
+        - aarch64
+    combination-filter: >
+      ARCH=="x86_64" ||
+      (ARCH=="aarch64" && XTRABACKUP_TARGET=="innodb80" && DOCKER_OS=="oraclelinux:9") ||
+      (ARCH=="aarch64" && XTRABACKUP_TARGET=="xtradb80" && DOCKER_OS=="amazonlinux:2023")
     builders:
     - trigger-builds:
       - project: percona-xtrabackup-8.0-test-pipeline
@@ -90,6 +101,7 @@
           DOCKER_OS=${{DOCKER_OS}}
           CMAKE_BUILD_TYPE=${{CMAKE_BUILD_TYPE}}
           XTRABACKUP_TARGET=${{XTRABACKUP_TARGET}}
+          ARCH=${{ARCH}}
           CLOUD=${{CLOUD}}
         block: true
         block-thresholds:
