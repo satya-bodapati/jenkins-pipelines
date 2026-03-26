@@ -1,9 +1,9 @@
 // Default to Hetzner
-String LABEL = (params.ARCH == 'aarch64') ? 'docker-aarch64' : 'docker-x64'
+String LABEL = 'docker-x64'
 String MICRO_LABEL = 'launcher-x64'
 
 if (params.CLOUD == 'AWS') {
-    LABEL = (params.ARCH == 'aarch64') ? 'docker-32gb-aarch64' : 'docker-32gb'
+    LABEL = 'docker-32gb'
     MICRO_LABEL = 'micro-amazon'
 }
 
@@ -20,7 +20,7 @@ pipeline {
             name: 'BRANCH',
             trim: true)
         choice(
-            choices: 'centos:8\noraclelinux:9\nubuntu:focal\nubuntu:jammy\nubuntu:noble\ndebian:bullseye\ndebian:bookworm\nasan\namazonlinux:2023',
+            choices: 'centos:8\noraclelinux:9\nubuntu:focal\nubuntu:jammy\nubuntu:noble\ndebian:bullseye\ndebian:bookworm\nasan',
             description: 'OS version for compilation',
             name: 'DOCKER_OS')
         choice(
@@ -35,10 +35,6 @@ pipeline {
             defaultValue: '',
             description: 'make options, like VERBOSE=1',
             name: 'MAKE_OPTS')
-        choice(
-            choices: 'x86_64\naarch64',
-            description: 'CPU architecture for compilation',
-            name: 'ARCH')
         choice(
             choices: 'Hetzner\nAWS',
             description: 'Host provider for Jenkins workers',
@@ -59,7 +55,7 @@ pipeline {
             steps {
                 timeout(time: 60, unit: 'MINUTES')  {
                     script {
-                        currentBuild.displayName = "${BUILD_NUMBER} ${CMAKE_BUILD_TYPE}/${DOCKER_OS}/${ARCH}"
+                        currentBuild.displayName = "${BUILD_NUMBER} ${CMAKE_BUILD_TYPE}/${DOCKER_OS}"
                     }
                     sh 'echo Prepare: \$(date -u "+%s")'
                     echo 'Checking Percona XtraBackup branch version, JEN-913 prevent wrong version run'
