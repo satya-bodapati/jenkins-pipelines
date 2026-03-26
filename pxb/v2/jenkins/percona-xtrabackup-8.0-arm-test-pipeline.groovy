@@ -1,17 +1,17 @@
-// Default to Hetzner
-String LABEL = 'docker-x64'
+// ARM64 test pipeline
+String LABEL = 'docker-aarch64'
 String MICRO_LABEL = 'launcher-x64'
 
 if (params.CLOUD == 'AWS') {
-    LABEL = 'docker-32gb'
+    LABEL = 'docker-32gb-aarch64'
     MICRO_LABEL = 'micro-amazon'
 }
 
 pipeline {
     parameters {
         choice(
-            choices: 'centos:8\noraclelinux:9\nubuntu:focal\nubuntu:jammy\nubuntu:noble\ndebian:bullseye\ndebian:bookworm\nasan\namazonlinux:2023',
-            description: 'OS version for compilation',
+            choices: 'oraclelinux:9\namazonlinux:2023',
+            description: 'OS version for testing',
             name: 'DOCKER_OS')
         choice(
             choices: 'RelWithDebInfo\nDebug',
@@ -22,11 +22,11 @@ pipeline {
             description: 'MySQL version for QA run',
             name: 'XTRABACKUP_TARGET')
         string(
-            defaultValue: '8.3.0',
+            defaultValue: '8.0.35',
             description: 'Version of MySQL InnoDB80 which will be used for bootstrap.sh script',
             name: 'INNODB80_VERSION')
         string(
-            defaultValue: '8.3.0.1',
+            defaultValue: '8.0.35-27',
             description: 'Version of Percona XtraDB80 which will be used for bootstrap.sh script',
             name: 'XTRADB80_VERSION')
         string(
@@ -57,10 +57,9 @@ pipeline {
             choices: 'Hetzner\nAWS',
             description: 'Host provider for Jenkins workers',
             name: 'CLOUD')
+
     }
-    agent {
-        label MICRO_LABEL
-    }
+    agent none
     options {
         skipDefaultCheckout()
         skipStagesAfterUnstable()
@@ -73,7 +72,7 @@ pipeline {
             steps {
                 timeout(time: 240, unit: 'MINUTES')  {
                     script {
-                        currentBuild.displayName = "${BUILD_NUMBER} ${CMAKE_BUILD_TYPE}/${DOCKER_OS}"
+                        currentBuild.displayName = "${BUILD_NUMBER} ${CMAKE_BUILD_TYPE}/${DOCKER_OS}/aarch64"
                     }
                     sh 'echo Prepare: \$(date -u "+%s")'
                     git branch: 'master', url: 'https://github.com/satya-bodapati/jenkins-pipelines'
@@ -87,7 +86,7 @@ pipeline {
                         sudo git -C sources reset --hard || :
                         sudo git -C sources clean -xdf   || :
                         '''
-                    copyArtifacts filter: 'COMPILE_BUILD_TAG', projectName: 'percona-xtrabackup-8.1-compile-param', selector: specific("${USE_BINARIES_FROM_BUILD_ID}")
+                    copyArtifacts filter: 'COMPILE_BUILD_TAG', projectName: 'percona-xtrabackup-8.0-arm-compile-param', selector: lastSuccessful()
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: '24e68886-c552-4033-8503-ed85bbaa31f3', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                         sh '''#!/bin/bash
                             for file in $(find . -name "COMPILE_BUILD_TAG"); do
@@ -96,22 +95,22 @@ pipeline {
 
                             for tarball in $(echo $COMPILE_BUILD_TAG_VAR); do
                                 if [[ $CMAKE_BUILD_TYPE == "Debug" ]] && [[ ${DOCKER_OS} != "asan" ]]; then
-                                    TARBALL=$(aws s3 ls pxb-build-cache/$tarball/ | grep x86_64-${DOCKER_OS//:/-}-debug | awk {'print $4'})
+                                    TARBALL=$(aws s3 ls pxb-build-cache/$tarball/ | grep aarch64-${DOCKER_OS//:/-}-debug | awk {'print $4'})
                                     if [[ ! -z $TARBALL ]]; then
                                         break
                                     fi
                                 elif [[ $CMAKE_BUILD_TYPE == "RelWithDebInfo" ]] && [[ ${DOCKER_OS} != "asan" ]]; then
-                                    TARBALL+=$(aws s3 ls pxb-build-cache/$tarball/ | grep x86_64-${DOCKER_OS//:/-}.tar.gz | awk {'print $4'})
+                                    TARBALL+=$(aws s3 ls pxb-build-cache/$tarball/ | grep aarch64-${DOCKER_OS//:/-}.tar.gz | awk {'print $4'})
                                     if [[ ! -z $TARBALL ]]; then
                                         break
                                     fi
                                 elif [[ $CMAKE_BUILD_TYPE == "Debug" ]] && [[ ${DOCKER_OS} == "asan" ]]; then
-                                    TARBALL+=$(aws s3 ls pxb-build-cache/$tarball/ | grep x86_64-${DOCKER_OS//:/-}-asan-debug | awk {'print $4'})
+                                    TARBALL+=$(aws s3 ls pxb-build-cache/$tarball/ | grep aarch64-${DOCKER_OS//:/-}-asan-debug | awk {'print $4'})
                                     if [[ ! -z $TARBALL ]]; then
                                         break
                                     fi
                                 elif [[ $CMAKE_BUILD_TYPE == "RelWithDebInfo" ]] && [[ ${DOCKER_OS} == "asan" ]]; then
-                                    TARBALL+=$(aws s3 ls pxb-build-cache/$tarball/ | grep x86_64-${DOCKER_OS//:/-}-asan | awk {'print $4'})
+                                    TARBALL+=$(aws s3 ls pxb-build-cache/$tarball/ | grep aarch64-${DOCKER_OS//:/-}-asan | awk {'print $4'})
                                     if [[ ! -z $TARBALL ]]; then
                                         break
                                     fi
@@ -172,9 +171,7 @@ pipeline {
     }
     post {
         always {
-            sh '''
-                echo Finish: \$(date -u "+%s")
-            '''
+            echo 'Pipeline finished'
         }
     }
 }

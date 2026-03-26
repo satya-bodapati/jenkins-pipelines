@@ -76,6 +76,7 @@
         - debian:bullseye
         - debian:bookworm
         - asan
+        - amazonlinux:2023
     - axis:
         name: XTRABACKUP_TARGET
         type: user-defined

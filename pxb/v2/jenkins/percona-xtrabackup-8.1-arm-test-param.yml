@@ -1,5 +1,5 @@
 - job:
-    name: percona-xtrabackup-8.1-test-param
+    name: percona-xtrabackup-8.1-arm-test-param
     project-type: matrix
     defaults: global
     description: |
@@ -26,7 +26,7 @@
     - string:
         name: USE_BINARIES_FROM_BUILD_ID
         default: "lastSuccessfulBuild"
-        description: Specific percona-xtrabackup-8.1-compile-param build id to use binaries from.
+        description: Specific percona-xtrabackup-8.1-arm-compile-param build id to use binaries from.
     - string:
         name: INNODB80_VERSION
         default: "8.3.0"
@@ -72,14 +72,7 @@
         type: user-defined
         name: DOCKER_OS
         values:
-        - centos:8
         - oraclelinux:9
-        - ubuntu:focal
-        - ubuntu:jammy
-        - ubuntu:noble
-        - debian:bullseye
-        - debian:bookworm
-        - asan
         - amazonlinux:2023
     - axis:
         name: XTRABACKUP_TARGET
@@ -87,9 +80,12 @@
         values:
         - innodb80
         - xtradb80
+    combination-filter: >
+      (XTRABACKUP_TARGET=="innodb80" && DOCKER_OS=="oraclelinux:9") ||
+      (XTRABACKUP_TARGET=="xtradb80" && DOCKER_OS=="amazonlinux:2023")
     builders:
     - trigger-builds:
-      - project: percona-xtrabackup-8.1-test-pipeline
+      - project: percona-xtrabackup-8.1-arm-test-pipeline
         current-parameters: true
         predefined-parameters: |
           DOCKER_OS=${{DOCKER_OS}}
@@ -104,12 +100,12 @@
     - shell: |
         sudo find . -name "*.xml" -o -name "*.log" -delete
     - copyartifact:
-        project: percona-xtrabackup-8.1-test-pipeline
+        project: percona-xtrabackup-8.1-arm-test-pipeline
         which-build: specific-build
-        build-number: "${{TRIGGERED_BUILD_NUMBERS_percona_xtrabackup_8_1_test_pipeline}}"
+        build-number: "${{TRIGGERED_BUILD_NUMBERS_percona_xtrabackup_8_1_arm_test_pipeline}}"
         do-not-fingerprint: true
     - shell: |
-        echo "${{TRIGGERED_BUILD_NUMBERS_percona_xtrabackup_8_1_test_pipeline}}" > PIPELINE_BUILD_NUMBER
+        echo "${{TRIGGERED_BUILD_NUMBERS_percona_xtrabackup_8_1_arm_test_pipeline}}" > PIPELINE_BUILD_NUMBER
     publishers:
     - junit:
         results: "**/junit.xml"

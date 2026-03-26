@@ -20,7 +20,7 @@ pipeline {
             name: 'BRANCH',
             trim: true)
         choice(
-            choices: 'centos:8\noraclelinux:9\nubuntu:focal\nubuntu:jammy\nubuntu:noble\ndebian:bullseye\ndebian:bookworm\nasan',
+            choices: 'centos:8\noraclelinux:9\nubuntu:focal\nubuntu:jammy\nubuntu:noble\ndebian:bullseye\ndebian:bookworm\nasan\namazonlinux:2023',
             description: 'OS version for compilation',
             name: 'DOCKER_OS')
         choice(
@@ -74,7 +74,7 @@ pipeline {
                         fi
                         rm -f ${WORKSPACE}/XB_VERSION-${BUILD_NUMBER}
                     '''
-                    git branch: 'master', url: 'https://github.com/Percona-Lab/jenkins-pipelines'
+                    git branch: 'master', url: 'https://github.com/satya-bodapati/jenkins-pipelines'
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: '24e68886-c552-4033-8503-ed85bbaa31f3', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                         sh '''#!/bin/bash
                             # sudo is needed for better node recovery after compilation failure

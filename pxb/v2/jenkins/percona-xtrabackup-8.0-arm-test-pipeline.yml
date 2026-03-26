@@ -1,5 +1,5 @@
 - job:
-    name: percona-xtrabackup-8.0-test-pipeline
+    name: percona-xtrabackup-8.0-arm-test-pipeline
     project-type: pipeline
     description: |
         Do not edit this job through the web!
@@ -12,21 +12,14 @@
             - "master"
             wipe-workspace: false
       lightweight-checkout: true
-      script-path: pxb/v2/jenkins/percona-xtrabackup-8.0-test-pipeline.groovy
+      script-path: pxb/v2/jenkins/percona-xtrabackup-8.0-arm-test-pipeline.groovy
     parameters:
     - choice:
         name: DOCKER_OS
         choices:
-          - centos:8
           - oraclelinux:9
-          - ubuntu:focal
-          - ubuntu:jammy
-          - ubuntu:noble
-          - debian:bullseye
-          - debian:bookworm
-          - asan
           - amazonlinux:2023
-        description: OS version for compilation
+        description: OS version for testing
     - choice:
         name: CMAKE_BUILD_TYPE
         choices:
@@ -77,4 +70,3 @@
         - "Hetzner"
         - "AWS"
         description: "Host provider for Jenkins workers"
-

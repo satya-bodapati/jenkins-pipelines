@@ -1,9 +1,9 @@
-// Default to Hetzner
-String LABEL = 'docker-x64'
+// ARM64 compile pipeline
+String LABEL = 'docker-aarch64'
 String MICRO_LABEL = 'launcher-x64'
 
 if (params.CLOUD == 'AWS') {
-    LABEL = 'docker-32gb'
+    LABEL = 'docker-32gb-aarch64'
     MICRO_LABEL = 'micro-amazon'
 }
 
@@ -20,7 +20,7 @@ pipeline {
             name: 'BRANCH',
             trim: true)
         choice(
-            choices: 'centos:8\noraclelinux:9\nubuntu:focal\nubuntu:jammy\nubuntu:noble\ndebian:bullseye\ndebian:bookworm\nasan\namazonlinux:2023',
+            choices: 'oraclelinux:9\namazonlinux:2023',
             description: 'OS version for compilation',
             name: 'DOCKER_OS')
         choice(
@@ -40,9 +40,7 @@ pipeline {
             description: 'Host provider for Jenkins workers',
             name: 'CLOUD')
     }
-    agent {
-        label MICRO_LABEL
-    }
+    agent none
     options {
         skipDefaultCheckout()
         skipStagesAfterUnstable()
@@ -55,7 +53,7 @@ pipeline {
             steps {
                 timeout(time: 60, unit: 'MINUTES')  {
                     script {
-                        currentBuild.displayName = "${BUILD_NUMBER} ${CMAKE_BUILD_TYPE}/${DOCKER_OS}"
+                        currentBuild.displayName = "${BUILD_NUMBER} ${CMAKE_BUILD_TYPE}/${DOCKER_OS}/aarch64"
                     }
                     sh 'echo Prepare: \$(date -u "+%s")'
                     echo 'Checking Percona XtraBackup branch version, JEN-913 prevent wrong version run'
@@ -146,9 +144,7 @@ pipeline {
     }
     post {
         always {
-            sh '''
-                echo Finish: \$(date -u "+%s")
-            '''
+            echo 'Pipeline finished'
         }
     }
 }

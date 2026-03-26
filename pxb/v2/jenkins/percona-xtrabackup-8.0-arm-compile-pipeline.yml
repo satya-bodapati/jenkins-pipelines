@@ -1,5 +1,5 @@
 - job:
-    name: percona-xtrabackup-8.0-compile-pipeline
+    name: percona-xtrabackup-8.0-arm-compile-pipeline
     project-type: pipeline
     description: |
         Do not edit this job through the web!
@@ -12,7 +12,7 @@
             - "master"
             wipe-workspace: false
       lightweight-checkout: true
-      script-path: pxb/v2/jenkins/percona-xtrabackup-8.0-compile-pipeline.groovy
+      script-path: pxb/v2/jenkins/percona-xtrabackup-8.0-arm-compile-pipeline.groovy
     parameters:
     - string:
         name: GIT_REPO
@@ -25,14 +25,7 @@
     - choice:
         name: DOCKER_OS
         choices:
-        - centos:8
         - oraclelinux:9
-        - ubuntu:focal
-        - ubuntu:jammy
-        - ubuntu:noble
-        - debian:bullseye
-        - debian:bookworm
-        - asan
         - amazonlinux:2023
         description: OS version for compilation
     - choice:

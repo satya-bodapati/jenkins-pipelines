@@ -60,6 +60,7 @@
          - debian:bullseye
          - debian:bookworm
          - asan
+         - amazonlinux:2023
     builders:
     - trigger-builds:
       - project: percona-xtrabackup-8.0-compile-pipeline

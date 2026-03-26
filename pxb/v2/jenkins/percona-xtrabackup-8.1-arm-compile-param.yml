@@ -1,5 +1,5 @@
 - job:
-    name: percona-xtrabackup-8.1-compile-param
+    name: percona-xtrabackup-8.1-arm-compile-param
     project-type: matrix
     defaults: global
     description: |
@@ -52,18 +52,11 @@
          type: user-defined
          name: DOCKER_OS
          values:
-         - centos:8
          - oraclelinux:9
-         - ubuntu:focal
-         - ubuntu:jammy
-         - ubuntu:noble
-         - debian:bullseye
-         - debian:bookworm
-         - asan
          - amazonlinux:2023
     builders:
     - trigger-builds:
-      - project: percona-xtrabackup-8.1-compile-pipeline
+      - project: percona-xtrabackup-8.1-arm-compile-pipeline
         current-parameters: true
         predefined-parameters: |
           DOCKER_OS=${{DOCKER_OS}}
@@ -77,12 +70,12 @@
     - shell: |
         sudo find . -name "*.xml" -o -name "*.log" -delete
     - copyartifact:
-        project: percona-xtrabackup-8.1-compile-pipeline
+        project: percona-xtrabackup-8.1-arm-compile-pipeline
         which-build: specific-build
-        build-number: "${{TRIGGERED_BUILD_NUMBERS_percona_xtrabackup_8_1_compile_pipeline}}"
+        build-number: "${{TRIGGERED_BUILD_NUMBERS_percona_xtrabackup_8_1_arm_compile_pipeline}}"
         do-not-fingerprint: true
     - shell: |
-        echo "${{TRIGGERED_BUILD_NUMBERS_percona_xtrabackup_8_1_compile_pipeline}}" > PIPELINE_BUILD_NUMBER
+        echo "${{TRIGGERED_BUILD_NUMBERS_percona_xtrabackup_8_1_arm_compile_pipeline}}" > PIPELINE_BUILD_NUMBER
         gunzip build.log.gz
     publishers:
     - raw:

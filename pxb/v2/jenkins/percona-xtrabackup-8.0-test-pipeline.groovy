@@ -10,7 +10,7 @@ if (params.CLOUD == 'AWS') {
 pipeline {
     parameters {
         choice(
-            choices: 'centos:8\noraclelinux:9\nubuntu:focal\nubuntu:jammy\nubuntu:noble\ndebian:bullseye\ndebian:bookworm\nasan',
+            choices: 'centos:8\noraclelinux:9\nubuntu:focal\nubuntu:jammy\nubuntu:noble\ndebian:bullseye\ndebian:bookworm\nasan\namazonlinux:2023',
             description: 'OS version for compilation',
             name: 'DOCKER_OS')
         choice(
@@ -77,7 +77,7 @@ pipeline {
                         currentBuild.displayName = "${BUILD_NUMBER} ${CMAKE_BUILD_TYPE}/${DOCKER_OS}"
                     }
                     sh 'echo Prepare: \$(date -u "+%s")'
-                    git branch: 'master', url: 'https://github.com/Percona-Lab/jenkins-pipelines'
+                    git branch: 'master', url: 'https://github.com/satya-bodapati/jenkins-pipelines'
                     sh '''#!/bin/bash
                         # sudo is needed for better node recovery after compilation failure
                         # if building failed on compilation stage directory will have files owned by docker user

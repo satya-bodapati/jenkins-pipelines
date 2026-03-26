@@ -1,9 +1,9 @@
-// Default to Hetzner
-String LABEL = 'docker-x64'
+// ARM64 compile pipeline
+String LABEL = 'docker-aarch64'
 String MICRO_LABEL = 'launcher-x64'
 
 if (params.CLOUD == 'AWS') {
-    LABEL = 'docker-32gb'
+    LABEL = 'docker-32gb-aarch64'
     MICRO_LABEL = 'micro-amazon'
 }
 
@@ -15,12 +15,12 @@ pipeline {
             name: 'GIT_REPO',
             trim: true)
         string(
-            defaultValue: 'trunk',
+            defaultValue: '8.0',
             description: 'Tag/Branch for percona-xtrabackup repository',
             name: 'BRANCH',
             trim: true)
         choice(
-            choices: 'centos:8\noraclelinux:9\nubuntu:focal\nubuntu:jammy\nubuntu:noble\ndebian:bullseye\ndebian:bookworm\nasan\namazonlinux:2023',
+            choices: 'oraclelinux:9\namazonlinux:2023',
             description: 'OS version for compilation',
             name: 'DOCKER_OS')
         choice(
@@ -39,10 +39,9 @@ pipeline {
             choices: 'Hetzner\nAWS',
             description: 'Host provider for Jenkins workers',
             name: 'CLOUD')
+
     }
-    agent {
-        label MICRO_LABEL
-    }
+    agent none
     options {
         skipDefaultCheckout()
         skipStagesAfterUnstable()
@@ -55,7 +54,7 @@ pipeline {
             steps {
                 timeout(time: 60, unit: 'MINUTES')  {
                     script {
-                        currentBuild.displayName = "${BUILD_NUMBER} ${CMAKE_BUILD_TYPE}/${DOCKER_OS}"
+                        currentBuild.displayName = "${BUILD_NUMBER} ${CMAKE_BUILD_TYPE}/${DOCKER_OS}/aarch64"
                     }
                     sh 'echo Prepare: \$(date -u "+%s")'
                     echo 'Checking Percona XtraBackup branch version, JEN-913 prevent wrong version run'
@@ -65,9 +64,9 @@ pipeline {
                         RAW_VERSION_LINK=$(echo ${GIT_REPO%.git} | sed -e "s:github.com:raw.githubusercontent.com:g")
                         curl ${RAW_VERSION_LINK}/${BRANCH}/XB_VERSION --output ${WORKSPACE}/XB_VERSION-${BUILD_NUMBER}
                         source ${WORKSPACE}/XB_VERSION-${BUILD_NUMBER}
-                        if ! [[ ${XB_VERSION_MAJOR}${XB_VERSION_MINOR} -gt ${MY_BRANCH_BASE_MAJOR}${MY_BRANCH_BASE_MINOR} ]] ; then
+                        if [[ ${XB_VERSION_MAJOR} -lt ${MY_BRANCH_BASE_MAJOR} ]] ; then
                             echo "Are you trying to build wrong branch?"
-                            echo "You are trying to build ${XB_VERSION_MAJOR}.${XB_VERSION_MINOR} instead of higer than ${MY_BRANCH_BASE_MAJOR}.${MY_BRANCH_BASE_MINOR}!"
+                            echo "You are trying to build ${XB_VERSION_MAJOR}.${XB_VERSION_MINOR} instead of ${MY_BRANCH_BASE_MAJOR}.${MY_BRANCH_BASE_MINOR}!"
                             rm -f ${WORKSPACE}/XB_VERSION-${BUILD_NUMBER}
                             exit 1
                         fi
@@ -122,7 +121,7 @@ pipeline {
             }
         }
         stage('Archive Build') {
-            agent { label MICRO_LABEL }
+            agent { label MICRO_LABEL}
             steps {
                 timeout(time: 60, unit: 'MINUTES')  {
                     retry(3) {
@@ -146,9 +145,7 @@ pipeline {
     }
     post {
         always {
-            sh '''
-                echo Finish: \$(date -u "+%s")
-            '''
+            echo 'Pipeline finished'
         }
     }
 }
