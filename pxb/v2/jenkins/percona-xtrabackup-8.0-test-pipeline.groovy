@@ -57,10 +57,6 @@ pipeline {
             choices: 'x86_64\naarch64',
             description: 'CPU architecture for testing',
             name: 'ARCH')
-        booleanParam(
-            defaultValue: true,
-            description: 'Run ARM64 (aarch64) test combinations',
-            name: 'WITH_ARM_TESTS')
         choice(
             choices: 'Hetzner\nAWS',
             description: 'Host provider for Jenkins workers',
@@ -78,10 +74,6 @@ pipeline {
     }
     stages {
         stage('Test') {
-            when {
-                beforeAgent true
-                expression { return !(params.ARCH == 'aarch64' && params.WITH_ARM_TESTS == false) }
-            }
             agent { label LABEL }
             steps {
                 timeout(time: 240, unit: 'MINUTES')  {
@@ -162,10 +154,6 @@ pipeline {
             }
         }
         stage('Archive Test Results') {
-            when {
-                beforeAgent true
-                expression { return !(params.ARCH == 'aarch64' && params.WITH_ARM_TESTS == false) }
-            }
             agent { label MICRO_LABEL }
             steps {
                 retry(3) {

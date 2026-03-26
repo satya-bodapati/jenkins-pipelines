@@ -55,10 +55,6 @@
         - "x86_64"
         - "aarch64"
         description: "CPU architecture for compilation"
-    - bool:
-        name: WITH_ARM_TESTS
-        default: true
-        description: "Run ARM64 (aarch64) test combinations"
     - choice:
         name: CLOUD
         choices:

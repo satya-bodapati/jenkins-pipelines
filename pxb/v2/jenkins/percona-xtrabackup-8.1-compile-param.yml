@@ -35,10 +35,6 @@
         name: MAKE_OPTS
         default:
         description: make options, like VERBOSE=1
-    - bool:
-        name: WITH_ARM_TESTS
-        default: true
-        description: "Run ARM64 (aarch64) test combinations"
     - choice:
         name: CLOUD
         choices:
@@ -82,7 +78,6 @@
           DOCKER_OS=${{DOCKER_OS}}
           CMAKE_BUILD_TYPE=${{CMAKE_BUILD_TYPE}}
           ARCH=${{ARCH}}
-          WITH_ARM_TESTS=${{WITH_ARM_TESTS}}
           CLOUD=${{CLOUD}}
         block: true
         block-thresholds:
