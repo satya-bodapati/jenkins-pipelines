@@ -56,10 +56,13 @@
             name: WITH_KMIP_TESTS
             default: false
             description: "Run kmip tests"
-        - bool:
-            name: WITH_ARM_TESTS
-            default: false
-            description: "Run ARM64 (aarch64) compile and test jobs"
+        - choice:
+            name: TEST_ARCH
+            choices:
+            - "x86_64"
+            - "aarch64"
+            - "both"
+            description: "Architecture(s) to compile and test"
         - choice:
             name: CLOUD
             choices:
@@ -73,15 +76,17 @@
         projects:
             - name: percona-xtrabackup-8.1-compile-param
               current-parameters: true
+              enable-condition: '${{TEST_ARCH}} != aarch64'
             - name: percona-xtrabackup-8.1-arm-compile-param
               current-parameters: true
-              enable-condition: '${{WITH_ARM_TESTS}} == true'
+              enable-condition: '${{TEST_ARCH}} != x86_64'
     - multijob:
         name: test-stage
         condition: UNSTABLE
         projects:
             - name: percona-xtrabackup-8.1-test-param
               current-parameters: true
+              enable-condition: '${{TEST_ARCH}} != aarch64'
             - name: percona-xtrabackup-8.1-arm-test-param
               current-parameters: true
-              enable-condition: '${{WITH_ARM_TESTS}} == true'
+              enable-condition: '${{TEST_ARCH}} != x86_64'
