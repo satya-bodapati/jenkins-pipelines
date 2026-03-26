@@ -76,17 +76,17 @@
         projects:
             - name: percona-xtrabackup-8.1-compile-param
               current-parameters: true
-              enable-condition: '${{TEST_ARCH}} != aarch64'
+              enable-condition: '"${{TEST_ARCH}}" != "aarch64"'
             - name: percona-xtrabackup-8.1-arm-compile-param
               current-parameters: true
-              enable-condition: '${{TEST_ARCH}} != x86_64'
+              enable-condition: '"${{TEST_ARCH}}" != "x86_64"'
     - multijob:
         name: test-stage
         condition: UNSTABLE
         projects:
             - name: percona-xtrabackup-8.1-test-param
               current-parameters: true
-              enable-condition: '${{TEST_ARCH}} != aarch64'
+              enable-condition: '"${{TEST_ARCH}}" != "aarch64"'
             - name: percona-xtrabackup-8.1-arm-test-param
               current-parameters: true
-              enable-condition: '${{TEST_ARCH}} != x86_64'
+              enable-condition: '"${{TEST_ARCH}}" != "x86_64"'
