@@ -56,6 +56,10 @@
             name: WITH_KMIP_TESTS
             default: false
             description: "Run kmip tests"
+        - bool:
+            name: WITH_ARM_TESTS
+            default: true
+            description: "Run ARM64 (aarch64) test combinations"
         - choice:
             name: CLOUD
             choices:

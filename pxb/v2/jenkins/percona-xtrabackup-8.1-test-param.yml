@@ -55,6 +55,10 @@
         name: WITH_KMIP_TESTS
         default: true
         description: "Run kmip tests"
+    - bool:
+        name: WITH_ARM_TESTS
+        default: true
+        description: "Run ARM64 (aarch64) test combinations"
     - choice:
         name: CLOUD
         choices:
@@ -106,6 +110,7 @@
           CMAKE_BUILD_TYPE=${{CMAKE_BUILD_TYPE}}
           XTRABACKUP_TARGET=${{XTRABACKUP_TARGET}}
           ARCH=${{ARCH}}
+          WITH_ARM_TESTS=${{WITH_ARM_TESTS}}
           CLOUD=${{CLOUD}}
         block: true
         block-thresholds:
